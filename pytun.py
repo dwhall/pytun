@@ -91,7 +91,7 @@ class Tunnel(object):
         self.name = None
         self.fd = None
 
-        if isinstance(self.mode, basestring):
+        if isinstance(self.mode, str):
             self.mode = self.MODES.get(self.mode, None)
 
             assert self.mode is not None, "%r is not a valid tunnel type." % (self.mode, )
@@ -106,7 +106,7 @@ class Tunnel(object):
     def mode_name(self):
         """ Returns the tunnel mode's name, for printing purpose. """
 
-        for name, id in self.MODES.iteritems():
+        for name, id in self.MODES.items():
             if id == self.mode:
                 return name
 
@@ -130,7 +130,7 @@ class Tunnel(object):
         try:
             ret = fcntl.ioctl(self.fd, self.TUNSETIFF, struct.pack("16sH", self.pattern, self.mode | self.no_pi))
 
-        except IOError, e:
+        except IOError as e:
             if e.errno == 1:
                 logger.error("Cannot open a %s tunnel because the operation is not permitted." % (self.mode_name.upper(), ))
                 raise self.NotPermitted()

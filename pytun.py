@@ -19,9 +19,9 @@ import struct
 import logging
 import functools
 
-TUN_KO_PATH = "/dev/net/tun"
 
 logger = logging.getLogger("pytun")
+
 
 class Tunnel(object):
     """tun/tap handler class """
@@ -57,7 +57,7 @@ class Tunnel(object):
     IFF_NOARP       = 0x80
     IFF_MULTICAST   = 0x1000
 
-    def __init__(self, mode="tun", pattern="", auto_open=True, no_pi=False):
+    def __init__(self, mode="tun", pattern="", auto_open=True, no_pi=False, tun_path="/dev/net/tun"):
         """Create a new tun/tap tunnel. Its type is defined by the
         argument 'mode', whose value can be either a string or
         the system value.
@@ -78,7 +78,7 @@ class Tunnel(object):
         self.pattern = pattern
         self.mode = mode
         self.no_pi = self.IFF_NO_PI if no_pi else 0x0000
-
+        self.tun_path = tun_path
         self.name = None
         self.fd = None
 
@@ -112,8 +112,8 @@ class Tunnel(object):
         """
         if self.fd is not None:
             raise self.AlreadyOpened()
-        logger.debug("Opening %s..." % (TUN_KO_PATH, ))
-        self.fd = os.open(TUN_KO_PATH, os.O_RDWR)
+        logger.debug("Opening %s..." % (self.tun_path, ))
+        self.fd = os.open(self.tun_path, os.O_RDWR)
         logger.debug("Opening %s tunnel '%s'..." % (self.mode_name.upper(), self.pattern, ))
         try:
             ret = fcntl.ioctl(self.fd, self.TUNSETIFF, struct.pack("16sH", self.pattern.encode(), self.mode | self.no_pi))

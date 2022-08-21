@@ -57,7 +57,7 @@ class Tunnel(object):
     IFF_NOARP       = 0x80
     IFF_MULTICAST   = 0x1000
 
-    def __init__(self, mode=None, pattern=None, auto_open=None, no_pi=False):
+    def __init__(self, mode="tun", pattern="", auto_open=True, no_pi=False):
         """Create a new tun/tap tunnel. Its type is defined by the
         argument 'mode', whose value can be either a string or
         the system value.
@@ -74,9 +74,6 @@ class Tunnel(object):
         bytes are added to the beginning of the packet (2 flag
         bytes and 2 protocol bytes).
         """
-        mode = mode if mode is not None else "tun"
-        pattern = pattern if pattern is not None else ""
-        auto_open = auto_open if auto_open is not None else True
         super(Tunnel, self).__init__()
         self.pattern = pattern
         self.mode = mode

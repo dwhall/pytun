@@ -26,12 +26,6 @@ logger = logging.getLogger("pytun")
 class Tunnel():
     """tun/tap handler class """
 
-    class AlreadyOpened(Exception):
-        """Raised when the user try to open a already-opened
-        tunnel.
-        """
-        pass
-
     class PermissionDenied(Exception):
         """Raised when pytun try to setup a new tunnel without
         the good permissions.
@@ -104,12 +98,9 @@ class Tunnel():
         return self.fd
 
     def open(self):
-        """Creates the tunnel.
-        If the tunnel is already opened, the function will
-        raise an AlreadyOpened exception.
-        """
-        if self.fd is not None:
-            raise self.AlreadyOpened()
+        """Opens the tunnel."""
+        if self.fd:
+            return
         logger.debug(f"Opening {self.tun_path}...")
         self.fd = os.open(self.tun_path, os.O_RDWR)
         logger.debug(f"Opening {self.mode_name.upper()} tunnel '{self.pattern}'...")

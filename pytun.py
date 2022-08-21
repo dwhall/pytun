@@ -115,13 +115,12 @@ class Tunnel():
         logger.debug(f"Opening {self.mode_name.upper()} tunnel '{self.pattern}'...")
         try:
             ret = fcntl.ioctl(self.fd, self.TUNSETIFF, struct.pack("16sH", self.pattern.encode(), self.mode | self.no_pi))
-
         except IOError as e:
             if e.errno == 1:
                 logger.error(f"Cannot open a {self.mode_name.upper()} tunnel because the operation is not permitted.")
                 raise self.PermissionDenied()
-
             raise
+
         self.name = ret[:16].strip(b"\x00").decode()
         logger.info(f"Tunnel '{self.name}' opened.")
 

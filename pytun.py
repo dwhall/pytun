@@ -1,8 +1,6 @@
-""" pytun
+"""pytun
 
-pytun is a tiny piece of code which gives you the ability to create and
-manage tun/tap tunnels on Linux (for now).
-
+Creates and manages tun/tap tunnels on Linux.
 """
 
 __author__ = "Gawen Arab"
@@ -26,17 +24,17 @@ TUN_KO_PATH = "/dev/net/tun"
 logger = logging.getLogger("pytun")
 
 class Tunnel(object):
-    """ tun/tap handler class """
+    """tun/tap handler class """
 
     class AlreadyOpened(Exception):
-        """ Raised when the user try to open a already-opened
-            tunnel.
+        """Raised when the user try to open a already-opened
+        tunnel.
         """
         pass
 
     class PermissionDenied(Exception):
-        """ Raised when pytun try to setup a new tunnel without
-            the good permissions.
+        """Raised when pytun try to setup a new tunnel without
+        the good permissions.
         """
         pass
 
@@ -60,22 +58,21 @@ class Tunnel(object):
     IFF_MULTICAST   = 0x1000
 
     def __init__(self, mode=None, pattern=None, auto_open=None, no_pi=False):
-        """ Create a new tun/tap tunnel. Its type is defined by the
-            argument 'mode', whose value can be either a string or
-            the system value.
+        """Create a new tun/tap tunnel. Its type is defined by the
+        argument 'mode', whose value can be either a string or
+        the system value.
 
-            The argument 'pattern set the string format used to
-            generate the name of the future tunnel. By default, for
-            Linux, it is "tun%d" or "tap%d" depending on the mode.
+        The argument 'pattern set the string format used to
+        generate the name of the future tunnel. By default, for
+        Linux, it is "tun%d" or "tap%d" depending on the mode.
 
-            If the argument 'auto_open' is true, this constructor
-            will automatically create the tunnel.
+        If the argument 'auto_open' is true, this constructor
+        will automatically create the tunnel.
 
-            If the argument 'no_pi' is true, the device will be
-            be opened with teh IFF_NO_PI flag. Otherwise, 4 extra
-            bytes are added to the beginning of the packet (2 flag
-            bytes and 2 protocol bytes).
-
+        If the argument 'no_pi' is true, the device will be
+        be opened with teh IFF_NO_PI flag. Otherwise, 4 extra
+        bytes are added to the beginning of the packet (2 flag
+        bytes and 2 protocol bytes).
         """
         mode = mode if mode is not None else "tun"
         pattern = pattern if pattern is not None else ""
@@ -103,7 +100,7 @@ class Tunnel(object):
 
     @property
     def mode_name(self):
-        """ Returns the tunnel mode's name, for printing purpose. """
+        """Returns the tunnel mode's name, for printing purpose."""
         for name, id in self.MODES.items():
             if id == self.mode:
                 return name
@@ -112,9 +109,9 @@ class Tunnel(object):
         return self.fd
 
     def open(self):
-        """ Create the tunnel.
-            If the tunnel is already opened, the function will
-            raised an AlreadyOpened exception.
+        """Create the tunnel.
+        If the tunnel is already opened, the function will
+        raised an AlreadyOpened exception.
         """
         if self.fd is not None:
             raise self.AlreadyOpened()
@@ -146,19 +143,19 @@ class Tunnel(object):
         return os.read(self.fd, size)
 
     def set_mac(self, mac):
-        """ Sets the MAC address of the device to 'mac'.
-            parameter 'mac' should be a binary representation
-            of the MAC address
-            Note: Will fail for TUN devices
+        """Sets the MAC address of the device to 'mac'.
+        parameter 'mac' should be a binary representation
+        of the MAC address
+        Note: Will fail for TUN devices
         """
         mac = map(ord, mac)
         ifreq = struct.pack('16sH6B8', self.name, socket.AF_UNIX, *mac)
         fcntl.ioctl(self.fileno(), self.SIOCSIFHWADDR, ifreq)
 
     def set_ipv4(self, ip):
-        """ Sets the IP address (ifr_addr) of the device
-            parameter 'ip' should be string representation of IP address
-            This does the same as ifconfig.
+        """Sets the IP address (ifr_addr) of the device
+        parameter 'ip' should be string representation of IP address
+        This does the same as ifconfig.
         """
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         bin_ip = socket.inet_aton(ip)

@@ -128,11 +128,12 @@ class Tunnel():
         return os.read(self.fd, size)
 
     def set_mac(self, mac):
-        """Sets the MAC address of the device to 'mac'.
-        parameter 'mac' should be a binary representation
-        of the MAC address
-        Note: Will fail for TUN devices
+        """Sets the MAC address of a TAP device to 'mac'.
+        The 'mac' address should be a binary representation.
+        Note: No effect for TUN devices
         """
+        if self.mode_name == "tun":
+            return
         mac = map(ord, mac)
         ifreq = struct.pack('16sH6B8', self.name, socket.AF_UNIX, *mac)
         fcntl.ioctl(self.fileno(), self.SIOCSIFHWADDR, ifreq)

@@ -89,9 +89,6 @@ class Tunnel(object):
         if auto_open:
             self.open()
 
-        if auto_open:
-            self.open()
-
     def __del__(self):
         self.close()
 

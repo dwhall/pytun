@@ -23,7 +23,7 @@ import functools
 logger = logging.getLogger("pytun")
 
 
-class Tunnel(object):
+class Tunnel():
     """tun/tap handler class """
 
     class AlreadyOpened(Exception):
@@ -58,11 +58,11 @@ class Tunnel(object):
     IFF_MULTICAST   = 0x1000
 
     def __init__(self, mode="tun", pattern="", auto_open=True, no_pi=False, tun_path="/dev/net/tun"):
-        """Create a new tun/tap tunnel. Its type is defined by the
-        argument 'mode', whose value can be either a string or
+        """Creates a new tun/tap tunnel. Its type is defined by the
+        argument 'mode' whose value can be either a string or
         the system value.
 
-        The argument 'pattern set the string format used to
+        The argument 'pattern' sets the string format used to
         generate the name of the future tunnel. By default, for
         Linux, it is "tun%d" or "tap%d" depending on the mode.
 
@@ -70,11 +70,12 @@ class Tunnel(object):
         will automatically create the tunnel.
 
         If the argument 'no_pi' is true, the device will be
-        be opened with teh IFF_NO_PI flag. Otherwise, 4 extra
+        be opened with the IFF_NO_PI flag. Otherwise, 4 extra
         bytes are added to the beginning of the packet (2 flag
         bytes and 2 protocol bytes).
         """
-        super(Tunnel, self).__init__()
+        super().__init__()
+
         self.pattern = pattern
         self.mode = mode
         self.no_pi = self.IFF_NO_PI if no_pi else 0x0000
@@ -103,32 +104,32 @@ class Tunnel(object):
         return self.fd
 
     def open(self):
-        """Create the tunnel.
+        """Creates the tunnel.
         If the tunnel is already opened, the function will
-        raised an AlreadyOpened exception.
+        raise an AlreadyOpened exception.
         """
         if self.fd is not None:
             raise self.AlreadyOpened()
-        logger.debug("Opening %s..." % (self.tun_path, ))
+        logger.debug(f"Opening {self.tun_path}...")
         self.fd = os.open(self.tun_path, os.O_RDWR)
-        logger.debug("Opening %s tunnel '%s'..." % (self.mode_name.upper(), self.pattern, ))
+        logger.debug(f"Opening {self.mode_name.upper()} tunnel '{self.pattern}'...")
         try:
             ret = fcntl.ioctl(self.fd, self.TUNSETIFF, struct.pack("16sH", self.pattern.encode(), self.mode | self.no_pi))
 
         except IOError as e:
             if e.errno == 1:
-                logger.error("Cannot open a %s tunnel because the operation is not permitted." % (self.mode_name.upper(), ))
+                logger.error(f"Cannot open a {self.mode_name.upper()} tunnel because the operation is not permitted.")
                 raise self.PermissionDenied()
 
             raise
         self.name = ret[:16].strip(b"\x00").decode()
-        logger.info("Tunnel '%s' opened." % (self.name, ))
+        logger.info(f"Tunnel '{self.name}' opened.")
 
     def close(self):
         if self.fd:
             os.close(self.fd)
             self.fd = None
-            logger.info("Tunnel '%s' closed." % (self.name or "", ))
+            logger.info(f"Tunnel '{self.name}' closed.")
 
     def send(self, buf):
         return os.write(self.fd, buf)
@@ -160,5 +161,4 @@ class Tunnel(object):
 
 
     def __repr__(self):
-        return "<%s tunnel '%s'>" % (self.mode_name.capitalize(), self.name, )
-
+        return f"<{self.mode_name.capitalize()} tunnel '{self.name}'>"

@@ -85,7 +85,7 @@ class Tunnel():
 
         if isinstance(self.mode, str):
             self.mode = self.MODES.get(self.mode, None)
-            assert self.mode is not None, "%r is not a valid tunnel type." % (self.mode, )
+            assert self.mode is not None, f"{mode} is not a valid tunnel type."
 
         if auto_open:
             self.open()

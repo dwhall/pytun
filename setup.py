@@ -1,19 +1,14 @@
 #!/usr/bin/env python
 
-try:
-    from setuptools import setup
-
-except:
-    from distutils.core import setup
-
-import os
+import setuptools
 
 import pytun
 
-setup(
+
+setuptools.setup(
     name = "pytun",
     description = "Python TUN/TAP tunnel module",
-    
+
     py_modules = ["pytun"],
     test_suite = "tests",
 

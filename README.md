@@ -2,28 +2,32 @@
 
 `pytun` is a Python module to manage tun/tap IP tunnel in the same way you would manipulate a file handler.
 
-For now, it is only compatible with Linux, probably Unix, maybe MacOsX, and in the future Windows.
+For now, it is only compatible with Linux and maybe some other POSIX systems.
 
-`pytun` is under the MIT license.
+`pytun` is released under the MIT license.
 
 ## How to use
 
-First of all, clone this repos or use `easy_install` or `pip`.
+First of all, clone this repo or use `easy_install` or `pip`.
 
     pip install pytun
     easy_install pytun
 
-Quite easy. Use the `open()` function.
+Quite easy, create and instance of a Tunnel
 
     import pytun
 
-    tun = pytun.open()  # Open a TUN mode tunnel
+    tun = pytun.Tunnel()  # Open a TUN mode tunnel
 
 For a TAP tunnel, add the `"tap"` argument.
 
-    tun = pytun.open("tap")
+    tun = pytun.Tunnel("tap")
 
-`tun` is the handler for the newly created tunnel and is manipulated like a file.
+or
+
+    tun = pytun.Tunnel(mode="tap")
+
+`tun` is the handle of the newly created tunnel and is manipulated like a file.
 
 To read/write, use the standard methods `recv([size = 1500])` and `send(buf)`
 
@@ -41,5 +45,3 @@ Finally, you can close the tunnel using the method `close()`.
     tun.close()
 
 The tunnel automatically closes when the object is not referenced anymore and the garbage collector destroys the handler.
-
-

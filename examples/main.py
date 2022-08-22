@@ -4,14 +4,10 @@ import select
 import pytun
 
 
-def pprint_buf(buf):
-    """ Dirty & convenient function to display the hexademical
-        repr. of a buffer.
-    """
-
+def pprint_in_hex(buf):
     DEFAULT_SIZE = 4
 
-    def hex2(i, l = None):
+    def hex2(i, l=None):
         l = l if l is not None else DEFAULT_SIZE
 
         h = hex(i).upper()[2:]
@@ -47,45 +43,31 @@ def pprint_buf(buf):
 
 
 def main():
-    # Configure pytun's logger
     pytun.logger.setLevel(logging.DEBUG)
     logging.basicConfig()
 
-    # Open the tunnel
     try:
-        tun = pytun.open()
+        tun = pytun.Tunnel()
 
-    except pytun.Tunnel.NotPermitted:
-        print()
+    except pytun.Tunnel.PermissionDenied:
         print("*" * 80)
-        print("You do have the rights to access the file %s." % (pytun.TUN_KO_PATH, ))
-        print("Give the access of this file to pytun, or if you trust me,")
-        print("elevate this current script to root level.")
+        print(f"You do not have the privileges to access {tun.tun_path}.\n"
+              "Give the access of this file to pytun, or\n"
+              "elevate this current script to root level.")
         print("*" * 80)
-        print()
-
         raise
 
     print("*" * 80)
-    print()
-    print("OK. The tunnel '%s' had been created." % (tun.name, ))
-    print()
-    print("If you want to play with it, first configure it.")
-    print()
-    print("1. Set up the network and set an IP")
-    print("    $ ifconfig %s 192.168.42.1" % (tun.name, ))
-    print()
-    print("2. Add the network route")
-    print("    $ route add -net 192.168.42.0/24 dev %s" % (tun.name, ))
-    print()
-    print("Then, try to ping some IP in this network ...")
-    print("    $ ping 192.168.42.42")
-    print()
-    print("Or do some UDP netcat magic.")
-    print("    $ nc 192.168.42.42 4242 -u")
-    print()
-    print("Enjoy !")
-    print()
+    print(f"The tunnel '{tun.name}' had been created.\n"
+          "If you want to play with it, first configure it.\n"
+          "1. Set up the network and set an IP\n"
+          f"    $ ifconfig {tun.name} 192.168.42.1\n"
+          "2. Add the network route\n"
+          f"    $ route add -net 192.168.42.0/24 dev {tun.name}\n"
+          "Then, try to ping some IP in this network ...\n"
+          "    $ ping 192.168.42.42\n"
+          "Or do some UDP netcat magic.\n"
+          "    $ nc 192.168.42.42 4242 -u\n")
     print("*" * 80)
 
     try:
@@ -93,18 +75,17 @@ def main():
         while True:
             buf = tun.recv()
 
-            pytun.logger.info("Packet received !")
-            pprint_buf(buf)
+            pytun.logger.info("Packet received")
+            pprint_in_hex(buf)
             print()
 
     except KeyboardInterrupt:
-        print("Keyboard interrupt. Closing.")
+        pass
 
     finally:
-        # Close the tunnel
         tun.close()
+        print("Closed.")
 
 
 if __name__ == "__main__":
     main()
-
